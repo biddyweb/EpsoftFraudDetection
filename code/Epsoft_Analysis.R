@@ -16,25 +16,32 @@ raw_data$医院编码 <- factor(raw_data$医院编码)
 
 # Case 1 Frequent Item Set Mining
 
-#remove the 
+#remove some freuquent medicine
 tmp <- t(matrix(unlist(apply(matrix(raw_data$西药清单,ncol=1),1,str_name_join)),nrow=2))
-pattern <- gsub('阿司匹林 |葡萄糖 |氯化钠 ','',tmp[,1])
+pattern <- gsub('阿司匹林,|葡萄糖,|氯化钠,|氯化钾,','',tmp[,1])
 
 write(pattern, file = "tmp_basket")
 trans <- read.transactions("tmp_basket",format = "basket", sep=",",rm.duplicates=T)
 trans@transactionInfo <- data.frame(transactionID=raw_data$就诊ID)
+if(file.exists('tmp_basket')) file.remove('tmp_basket')
+
 
 #build the model
 closed <- eclat(trans, 
-                  parameter = list(minlen=2,support=0.05,tidLists=TRUE,
+                parameter = list(minlen=2,maxlen=10,support=0.05,tidLists=TRUE,
                                    target = "closed frequent itemsets"))
-qwewqe
 FrequentMedicineSet <- subset(sort(closed,by = 'support'))
 FrequentMedicineSetList <- as(FrequentMedicineSet@tidLists,'list')
-result <- cbind(as(FrequentMedicineSet,'data.frame'),unlist(lapply(FrequentMedicineSetList,function(x){paste(x,collapse=' ')})))
+result <- cbind(as(FrequentMedicineSet,'data.frame'),tidlist=unlist(lapply(FrequentMedicineSetList,function(x){paste(x,collapse=' ')})))
+
+scores <- matrix(nrow = nrow(raw_data), ncol = 2,0)
+scores[,1] <- raw_data$就诊ID
+for(i in 1:nrow(result)){
+    scores[scores[,1] %in% unlist(strsplit(as.character(result$tidlist[i]),' ')),2] = scores[scores[,1] %in% unlist(strsplit(as.character(result$tidlist[i]),' ')),2] + result$support[i]    
+}
 
 # export to a file
-#write(result,file='闭合频繁项集.csv',sep=',')
+write.table(result,file='闭合频繁项集.csv',sep=',')
 
 
 
