@@ -28,7 +28,7 @@ trans@transactionInfo <- data.frame(transactionID=raw_data$就诊ID)
 closed <- eclat(trans, 
                   parameter = list(minlen=2,support=0.05,tidLists=TRUE,
                                    target = "closed frequent itemsets"))
-
+qwewqe
 FrequentMedicineSet <- subset(sort(closed,by = 'support'))
 FrequentMedicineSetList <- as(FrequentMedicineSet@tidLists,'list')
 result <- cbind(as(FrequentMedicineSet,'data.frame'),unlist(lapply(FrequentMedicineSetList,function(x){paste(x,collapse=' ')})))
