@@ -28,7 +28,7 @@ if(file.exists('tmp_basket')) file.remove('tmp_basket')
 
 #build the model
 closed <- eclat(trans, 
-                parameter = list(minlen=2,maxlen=10,support=0.05,tidLists=TRUE,
+                parameter = list(minlen=1,maxlen=2,support=0.05,tidLists=TRUE,
                                    target = "closed frequent itemsets"))
 FrequentMedicineSet <- subset(sort(closed,by = 'support'))
 FrequentMedicineSetList <- as(FrequentMedicineSet@tidLists,'list')
