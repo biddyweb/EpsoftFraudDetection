@@ -13,19 +13,21 @@ GenerateStrsizematrixFromRawdata<-function(x){
 GenerateTransFromStrsizematrix <- function(x){
     write(x, file = "tmp_basket")
     trans <- read.transactions("tmp_basket",format = "basket", sep=",",rm.duplicates=T)
-    trans@transactionInfo <- data.frame(transactionID=raw_data$就诊ID)
+    trans@transactionInfo <- data.frame(transactionID=rawdata$就诊ID)
     if(file.exists('tmp_basket')) file.remove('tmp_basket')
     return (trans)
 }
 
 rawdata <- read.csv('data//糖尿病_sequence.csv')
 
-xiyao <- generate_str_size_matrix(raw_data$西药清单)
-zhongchengyao <- generate_str_size_matrix(raw_data$中成药清单)
-zhongyao <- generate_str_size_matrix(raw_data$中药清单)
-zhenliao <- generate_str_size_matrix(raw_data$诊疗)
+xiyao <- GenerateStrsizematrixFromRawdata(rawdata$西药清单)
+zhongchengyao <- GenerateStrsizematrixFromRawdata(rawdata$中成药清单)
+zhongyao <- GenerateStrsizematrixFromRawdata(rawdata$中药清单)
+zhenliao <- GenerateStrsizematrixFromRawdata(rawdata$诊疗)
 
-
+yaopin.all <- cbind(xiyao,zhongyao,zhongchengyao,zhenliao)
 zhenliao.trans <- GenerateTransFromStrsizematrix(zhenliao[,1])
 tmp <- sort(itemFrequency(zhenliao.trans,type='absolute'),decreasing=T)
-itemFrequencyPlot(zhenliao.trans,cex.names=0.6,topN=20,type='absolute')
+
+itemFrequencyPlot(zhenliao.trans,type='absolute')
+
